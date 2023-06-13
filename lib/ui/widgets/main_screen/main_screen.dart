@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:test_app/ui/widgets/account_screen/account_screen.dart';
-import 'package:test_app/ui/widgets/cart_screen/cart_screen.dart';
 import 'package:test_app/ui/widgets/cart_screen/cart_screen_model.dart';
 import 'package:test_app/ui/widgets/main_screen/categories_screen/categories_screen_model.dart';
 import 'package:test_app/ui/const/constants.dart';
 import '../../const/asset_icons.dart';
 import '../../navigation/tab_navigator.dart';
-import '../search/search.dart';
-import 'categories_screen/categories_screen.dart';
+
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -17,9 +14,12 @@ class MainScreen extends StatefulWidget {
       providers: [
         ChangeNotifierProvider(
           create: (_) => CategoriesScreenModel(),
-          lazy: false,),
-        ChangeNotifierProvider(create: (_) => CartScreenModel(),)
-          ],
+          lazy: false,
+        ),
+        ChangeNotifierProvider(
+          create: (_) => CartScreenModel(),
+        )
+      ],
       child: const MainScreen(),
     );
   }
@@ -31,12 +31,6 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   int _selectedWidgetIndex = 0;
   String _currentWidgetKey = Constants.main;
-  final _bodyOptions = [
-    const CategoriesScreen(),
-    const SearchScreen(),
-    const CartScreen(),
-    const AccountScreen()
-  ];
 
   List<String> widgetKeys = [
     Constants.main,
@@ -45,12 +39,7 @@ class _MainScreenState extends State<MainScreen> {
     Constants.account
   ];
 
-  Map<String, GlobalKey<NavigatorState>> navigatorKeys = {
-    Constants.main: GlobalKey<NavigatorState>(),
-    Constants.search: GlobalKey<NavigatorState>(),
-    Constants.cart: GlobalKey<NavigatorState>(),
-    Constants.account: GlobalKey<NavigatorState>(),
-  };
+  Map<String, GlobalKey<NavigatorState>> navigatorKeys = TabNavigatorKeys.keys;
   void onItemTapped(String item, int index) {
     if (index == _selectedWidgetIndex) {
       navigatorKeys[item]?.currentState?.popUntil((route) => route.isFirst);
@@ -60,16 +49,6 @@ class _MainScreenState extends State<MainScreen> {
     _selectedWidgetIndex = index;
     _currentWidgetKey = widgetKeys[index];
     setState(() {});
-  }
-
-  buildNavigator() {
-    return Navigator(
-      key: navigatorKeys[_selectedWidgetIndex],
-      onGenerateRoute: (RouteSettings settings) {
-        return MaterialPageRoute(
-            builder: (_) => _bodyOptions.elementAt(_selectedWidgetIndex));
-      },
-    );
   }
 
   Widget _buildOffstageNavigator(String tabItem) {
@@ -89,13 +68,13 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(children: <Widget>[
-        _buildOffstageNavigator(Constants.main),
-        _buildOffstageNavigator(Constants.search),
-        _buildOffstageNavigator(Constants.cart),
-        _buildOffstageNavigator(Constants.account),
-      ]),
-      bottomNavigationBar: BottomNavigationBar(
+        body: Stack(children: <Widget>[
+          _buildOffstageNavigator(Constants.main),
+          _buildOffstageNavigator(Constants.search),
+          _buildOffstageNavigator(Constants.cart),
+          _buildOffstageNavigator(Constants.account),
+        ]),
+        bottomNavigationBar: BottomNavigationBar(
           selectedFontSize: 12.0,
           unselectedFontSize: 12.0,
           items: const [
@@ -116,7 +95,6 @@ class _MainScreenState extends State<MainScreen> {
           ],
           currentIndex: _selectedWidgetIndex,
           onTap: ((index) => onItemTapped(widgetKeys[index], index)),
-        )
-    );
+        ));
   }
 }
